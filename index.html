@@ -14,10 +14,13 @@
 
 			figure {
 				text-align: center;
+				font-size: 14px;
 			}
 
 			img {
 				display: inline-block;
+				border: 1px solid black;
+				margin-bottom: 5px;
 			}
 
 			body {
@@ -28,15 +31,15 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Fall 2026 Homework 1 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">Names: Lauren Tang</div>
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/fa26">cs184.eecs.berkeley.edu/fa26</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw1-tang-triangles-writeup/">https://cal-cs184-student.github.io/hw1-tang-triangles-writeup/</a>
 		
 		<br>
 
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/fa26">cs184.eecs.berkeley.edu/fa26</a>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/hw1-tang-triangles">https://github.com/cal-cs184-student/hw1-tang-triangles</a>
 
 		<figure>
 			<img src="assets/lion.jpg" alt="Lion" style="width:50%"/>
@@ -51,7 +54,28 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Rasterizing a triangle is simply sampling it in 2D, wherein we evaluate each pixel to determine if it falls
+		inside the triangle. If the pixel does, it is colored in. In terms of code implementation, we can perform three line 
+		tests for each pixel, where we construct the lines formed by each pair of the triangle's vertices. To evaluate a
+		pixel's center relative to a line, we use the equation <center>L<sub>i</sub>(x, y) = -(x - X<sub>i</sub>)*(Y
+		<sub>i+1</sub> - Y<sub>i</sub>) + (y - Y<sub>i</sub>)*(X<sub>i+1</sub> - X<sub>i</sub>),</center> where (X<sub>i
+		</sub>, Y<sub>i</sub>) is one vertex of the triangle and (X<sub>i+1</sub>, Y<sub>i+1</sub>) is the subsequent one.
+		If L(x, y) = 0, the point is on the line (and therefore the boundary of the triangle); if L(x, y) > 0, it's above the 
+		line, and otherwise it's below the line. A point is therefore inside the triangle if L(x, y) > 0 for all 3 line segments. (I also
+		discovered via brute force that a point is in the triangle if L(x, y) < 0 for all 3 line segments -- it's not possible for
+		points outside of the triangle to have all three L(x, y) values be the same sign!)
+		<br>
+		<br>
+		I used the simple bounding box algorithm to minimize the number of samples I needed to evaluate, so it is (hopefully)
+		equivalent and no worse. I identified the minimum x- and y-coordinates containing the full triangle
+		and used that for my bounding box, where I only sampled the pixel centers within those coordinates and none 
+		outside of them.
+
+		<figure>
+			<img src="assets/task1_screenshot.png" alt="Screenshot of basic/test4.svg" style="width:50%"/>
+			<figcaption>Screenshot of basic/test4.svg, with the pixel inspector focused on the tip of the magenta triangle.</figcaption>
+		</figure>
+
 
 		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
