@@ -69,7 +69,7 @@
 		outside of them.
 
 		<figure>
-			<img src="assets/task1.png" alt="Screenshot of basic/test4.svg" style="width:63%"/>
+			<img src="assets/task1.png" alt="Screenshot of basic/test4.svg" style="width:55%"/>
 			<figcaption>Screenshot of basic/test4.svg, with the pixel inspector focused on the tip of the magenta triangle.</figcaption>
 		</figure>
 		
@@ -92,8 +92,8 @@
 		The result of this antialiasing via supersampling is that pixels near the boundaries of certain shapes will also be filled
 		in with colors that are a mix of adjacent pixels, which visually smooths out the jagged edges when viewed from further 
 		away. See the examples below; at higher sampling rates, the rightmost tip of the red triangle isn't detached but instead
-		filled in with color averages of surrounding pixels, with the 16x sample rate image appearing much smoother compared to
-		the 1x sample rate image.
+		filled in with color averages of surrounding pixels, so that the triangle appears to be fully continous. The 16x sample rate image 
+		overall appears much smoother compared to the 1x sample rate image.
 
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -123,7 +123,7 @@
 		<h2>Task 3: Transforms</h2>
 
 		<figure>
-			<img src="assets/task3.png" alt="Screenshot of basic/test4.svg" style="width:63%"/>
+			<img src="assets/task3.png" alt="Screenshot of transforms/my_robot.svg" style="width:55%"/>
 			<figcaption>Screenshot of transforms/my_robot.svg.</figcaption>
 		</figure>
 
@@ -134,9 +134,30 @@
 		throughout this process to keep them more visually aligned.
 
 
-		<h2>Task 4: Barycentric coordinates</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<h2>Task 4: Barycentric Coordinates</h2>
 
+		Barycentric coordinates are (as the name suggests) a coordinate system for triangles. Given three vertices of a triangle A, B, and C
+		in Cartesian coordinates, we can express a point (x, y) within the triangle as a weighted combination of these vertices, such that 
+		<center>\( (x, y) = \alpha * A + \beta * B + \gamma * C \),</center> <center>\( \alpha + \beta + \gamma = 1 \),</center> <center>and 
+		\( \alpha >= 0, \, \beta >= 0, \, and \; \gamma >= 0 \).</center> The barycentric coordinates of \( (x, y) \) are therefore \( (\alpha, 
+		\beta, \gamma) \). See the diagram below.
+		
+		<figure>
+			<img src="assets/task4_1.png" alt="Barycentric coordinates diagram" style="width:55%"/>
+			<figcaption>A diagram of barycentric coordinates, taken from Yoko's Discussion #3 slides.</figcaption>
+		</figure>
+		
+		This coordinate system linearly interpolates values located at the triangle's vertices, which is very useful for coloring triangles
+		with interpolation -- if vertex A is red, vertex B is green, and vertex C is blue, the color at point (x, y) will be a weighted 
+		combination of the values of these colors: \( color(x, y) = \alpha * red + \beta * green + \gamma * blue \). This produces a color
+		gradient effect when used in conjunction with rasterizing triangles; as the bounding box of the triangle is sampled, each pixel is filled
+		in if it lies inside the triangle, and the pixel's color depends on its barycentric coordinates within the triangle.
+
+		<figure>
+			<img src="assets/task4_2.png" alt="Screenshot of basic/test7.svg" style="width:55%"/>
+			<figcaption>Screenshot of basic/test7.svg.</figcaption>
+		</figure>		
+	
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
