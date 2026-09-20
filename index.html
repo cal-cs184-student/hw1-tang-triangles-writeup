@@ -51,7 +51,8 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
-		Rasterizing a triangle is simply sampling it in 2D, wherein we evaluate each pixel to determine if it falls
+		Rasterizing is the process of rendering vector graphics into 2D pixel images. 
+		To rasterize a triangle, we simply sample it in 2D, wherein we evaluate each pixel to determine if it falls
 		inside the triangle. If the pixel does, it is colored in. In terms of code implementation, we can perform three line 
 		tests for each pixel, where we construct the lines formed by each pair of the triangle's vertices. To evaluate a
 		pixel's center relative to a line, we use the equation <center>\( L_i(x, y) = -(x - X_i)*(Y_{i+1} - Y_i) + (y - Y_i)*
@@ -70,7 +71,7 @@
 
 		<figure>
 			<img src="assets/task1.png" alt="Screenshot of basic/test4.svg" style="width:55%"/>
-			<figcaption>Screenshot of basic/test4.svg, with the pixel inspector focused on the tip of the magenta triangle.</figcaption>
+			<figcaption>basic/test4.svg, with the pixel inspector focused on the tip of the magenta triangle.</figcaption>
 		</figure>
 		
 		<h2>Task 2: Antialiasing by Supersampling</h2>
@@ -101,19 +102,19 @@
 				<td style="text-align: center;">
 					<figure>
 						<img src="assets/task2_1.png" alt="Screenshot of test4.svg at 1x sample rate" width="350px"/>
-						<figcaption>Test4.svg at 1x sample rate.</figcaption>
+						<figcaption>test4.svg at 1x sample rate.</figcaption>
 					</figure>
 				</td>
 				<td style="text-align: center;">
 					<figure>
 						<img src="assets/task2_4.png" alt="Screenshot of test4.svg at 4x sample rate" width="350px"/>
-						<figcaption>Test4.svg at 4x sample rate.</figcaption>
+						<figcaption>test4.svg at 4x sample rate.</figcaption>
 					</figure>
 				</td>
 				<td style="text-align: center;">
 					<figure>
 						<img src="assets/task2_16.png" alt="Screenshot of test4.svg at 16x sample rate" width="350px"/>
-						<figcaption>Test4.svg at 16x sample rate.</figcaption>
+						<figcaption>test4.svg at 16x sample rate.</figcaption>
 					</figure>
 				</td>
 			  </tr>
@@ -158,8 +159,76 @@
 			<figcaption>Screenshot of basic/test7.svg.</figcaption>
 		</figure>		
 	
-		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<h2>Task 5: "Pixel Sampling" for Texture Mapping</h2>
+
+		Texture mapping can be performed by pixel sampling, which is just the same simple process we've been using to rasterize triangles: 
+		for each pixel in a triangle's bounding box, if it falls inside the triangle, it is rasterized and then assigned the color value of 
+		the corresponding texel, thus applying the texture to the triangle. In this code implementation, our goal is to map the coordinates (x, y)
+		in the screen space to the coordinates (u, v) in the texture space. Since the triangle vertices are given in both the screen and texture
+		space, barycentric coordinates make it very easy to find the texture space coordinates of any point inside the triangle. I used the same
+		formulas as in task 4 to calculate the screen sample's barycentric coordinates, and then implemented the two methods below for 
+		determining the texel color to use for the screen sample.
+		<br>
+		<br>
+		The <strong>nearest neighbors</strong> method is very simple and thus efficient: after scaling the barycentric coordinates of the 
+		screen sample based on the texture's height and width, we can find the nearest texel, which is just the texel that the sampling 
+		point is located in. The color of that texel is then used to fill the screen sample pixel. This approach can produce aliasing effects, 
+		especially when used to map high-resolution textures. However, the standard antialiasing approach via supersampling can be highly
+		costly, because the sampling rate must also be extremely high to preserve the fine details of the texture.
+		<br>
+		<br>
+		<strong>Bilinear interpolation</strong> addresses this by performing antialiasing with just a few texels per pixel. Once again, we 
+		use the barycentric coordinates of the pixel sample location to find the corresponding texel, but we then consider the 4 closest
+		texels rather than the singular texel. Using a series of bilinear interpolations between the pixel sampling location and these texel
+		locations (2 horizontal, then 1 vertical in my implementation), we calculate the color for the pixel sample as a weighted average 
+		of the color of these surrounding texels. This method reduces the appearance of jaggies and smooths them over well, although it may muddle 
+		textures with fine/intricate details or high-contrast colors.
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+					<figure>
+						<img src="assets/task5_nn1.png" alt="Screenshot of test4.svg at 1x sample rate" width="350px"/>
+						<figcaption>test5.svg, nearest neighbors, 1x sample rate.</figcaption>
+					</figure>
+				</td>
+				<td style="text-align: center;">
+					<figure>
+						<img src="assets/task5_bi1.png" alt="Screenshot of test4.svg at 4x sample rate" width="350px"/>
+						<figcaption>test5.svg, bilinear interpolation, 1x sample rate.</figcaption>
+					</figure>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+					<figure>
+						<img src="assets/task5_nn16.png" alt="Screenshot of test4.svg at 16x sample rate" width="350px"/>
+						<figcaption>test5.svg, nearest neighbors, 16x sample rate.</figcaption>
+					</figure>
+				</td>
+				<td style="text-align: center;">
+					<figure>
+						<img src="assets/task5_bi16.png" alt="Screenshot of test4.svg at 16x sample rate" width="350px"/>
+						<figcaption>test5.svg, bilinear interpolation, 16x sample rate.</figcaption>
+					</figure>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		In the renderings of the UC Berkeley seal above, pixel sampling via bilinear interpolation provides greater visual clarity
+		than nearest neighbors does. This is especially visible at 1x sampling rate, where in the rendering using nearest neighbors, 
+		"BER" could be mistaken for "AEP." (At least, that's what I saw, even though I knew it was the Berkeley seal. 😅) Bilinear 
+		interpolation both improves the readability of the letters and smooths out the curve of the blue banner, providing some slight 
+		antialiasing.
+		<br>
+		<br>
+		These examples demonstrate a visual difference between the two methods, where nearest neighbors pixel sampling will produce plenty
+		of aliasing effects at low sampling rates, and bilinear interpolation is able to provide an anti-aliasing effect for textures. However, the 
+		advantage of nearest neighbors is that it's much more computationally efficient compared to bilinear interpolation, since 
+		bilinear interpolation must average the 4 texels closest to each sampling location. Consequently, using bilinear interpolation 
+		to render large scenes may take much more time than nearest neighbors pixel sampling would.
 
 		<h2>Task 6: "Level Sampling" with mipmaps for texture mapping</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
