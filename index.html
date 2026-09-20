@@ -164,10 +164,11 @@
 		Texture mapping can be performed by pixel sampling, which is just the same simple process we've been using to rasterize triangles: 
 		for each pixel in a triangle's bounding box, if it falls inside the triangle, it is rasterized and then assigned the color value of 
 		the corresponding texel, thus applying the texture to the triangle. In this code implementation, our goal is to map the coordinates (x, y)
-		in the screen space to the coordinates (u, v) in the texture space. Since the triangle vertices are given in both the screen and texture
-		space, barycentric coordinates make it very easy to find the texture space coordinates of any point inside the triangle. I used the same
-		formulas as in task 4 to calculate the screen sample's barycentric coordinates, and then implemented the two methods below for 
-		determining the texel color to use for the screen sample.
+		in the screen space to the coordinates (u, v) in the texture space. Since we have the coordinates of the triangle's vertices in screen
+		space as well as their corresponding locations in texture space, barycentric coordinates make it very easy to find the texture space 
+		coordinates of any point located inside the triangle. I used the same formulas as in task 4 to calculate the screen sample's 
+		barycentric coordinates based on the triangle's vertices, and then implemented the two methods below for determining the texel 
+		color to use for the screen sample.
 		<br>
 		<br>
 		The <strong>nearest neighbors</strong> method is very simple and thus efficient: after scaling the barycentric coordinates of the 
@@ -219,7 +220,7 @@
 
 		In the renderings of the UC Berkeley seal above, pixel sampling via bilinear interpolation provides greater visual clarity
 		than nearest neighbors does. This is especially visible at 1x sampling rate, where in the rendering using nearest neighbors, 
-		"BER" could be mistaken for "AEP." (At least, that's what I saw, even though I knew it was the Berkeley seal. 😅) Bilinear 
+		"BER" could be mistaken for "AEP." (At least, that's what I saw initially, even though I knew it was the Berkeley seal. 😅) Bilinear 
 		interpolation both improves the readability of the letters and smooths out the curve of the blue banner, providing some slight 
 		antialiasing.
 		<br>
