@@ -58,8 +58,8 @@
 		pixel's center relative to a line, we use the equation <center>\( L_i(x, y) = -(x - X_i)*(Y_{i+1} - Y_i) + (y - Y_i)*
 		(X_{i+1} - X_i) \), </center> where \( (X_i, Y_i) \) is one vertex of the triangle and \( (X_{i+1}, Y_{i+1}) \) is 
 		the subsequent one. If \( L(x, y) = 0 \), the point is on the line (and therefore the boundary of the triangle); 
-		if \( L(x, y) > 0 \), it's above the line, and otherwise it's below the line. A point is therefore inside the 
-		triangle if \( L(x, y) > 0 \) for all 3 line segments. (I also discovered via brute force that a point is in the 
+		if \( L(x, y) > 0 \), it's above the line, and otherwise it's below the line. Since we consider points on a triangle's boundary
+		to be within the triangle, a point is therefore inside the triangle if \( L(x, y) >= 0 \) for all 3 line segments. (I also discovered via brute force that a point is in the 
 		triangle if \( L(x, y) < 0 \) for all 3 line segments -- it's not possible for points outside of the triangle to have 
 		all three \( L(x, y) \) values be the same sign!)
 		<br>
@@ -190,13 +190,13 @@
 			  <tr>
 				<td style="text-align: center;">
 					<figure>
-						<img src="assets/task5_nn1.png" alt="Screenshot of test4.svg at 1x sample rate" width="350px"/>
+						<img src="assets/task5_nn1.png" alt="Screenshot of test5.svg at 1x sample rate using nearest neighbors" width="350px"/>
 						<figcaption>test5.svg, nearest neighbors, 1x sample rate.</figcaption>
 					</figure>
 				</td>
 				<td style="text-align: center;">
 					<figure>
-						<img src="assets/task5_bi1.png" alt="Screenshot of test4.svg at 4x sample rate" width="350px"/>
+						<img src="assets/task5_bi1.png" alt="Screenshot of test5.svg at 1x sample rate using bilinear interpolation" width="350px"/>
 						<figcaption>test5.svg, bilinear interpolation, 1x sample rate.</figcaption>
 					</figure>
 				</td>
@@ -204,13 +204,13 @@
 			  <tr>
 				<td style="text-align: center;">
 					<figure>
-						<img src="assets/task5_nn16.png" alt="Screenshot of test4.svg at 16x sample rate" width="350px"/>
+						<img src="assets/task5_nn16.png" alt="Screenshot of test5.svg at 16x sample rate using nearest neighbors" width="350px"/>
 						<figcaption>test5.svg, nearest neighbors, 16x sample rate.</figcaption>
 					</figure>
 				</td>
 				<td style="text-align: center;">
 					<figure>
-						<img src="assets/task5_bi16.png" alt="Screenshot of test4.svg at 16x sample rate" width="350px"/>
+						<img src="assets/task5_bi16.png" alt="Screenshot of test5.svg at 16x sample rate using bilinear interpolation" width="350px"/>
 						<figcaption>test5.svg, bilinear interpolation, 16x sample rate.</figcaption>
 					</figure>
 				</td>
@@ -231,9 +231,119 @@
 		bilinear interpolation must average the 4 texels closest to each sampling location. Consequently, using bilinear interpolation 
 		to render large scenes may take much more time than nearest neighbors pixel sampling would.
 
-		<h2>Task 6: "Level Sampling" with mipmaps for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<h2>Task 6: "Level Sampling" with Mipmaps for Texture Mapping</h2>
 
+		
+
+		I used a high resolution screenshot (3840 x 2160) of one of my favorite video games, Mirror's Edge, to create the test_flight.svg,
+		and focused on the lower-right section of the image since significant moiré effects are visible on the tiled floor without antialiasing. 
+		The screenshots below are all shown at 1x sample rate to display the differences from each combination of texture mapping methods. 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+					<figure>
+						<img src="assets/task6_lznn.png" alt="Screenshot of test_flight.svg using level 0 nearest neighbors" width="350px"/>
+						<figcaption>test_flight.svg, level 0, nearest neighbors.</figcaption>
+					</figure>
+				</td>
+				<td style="text-align: center;">
+					<figure>
+						<img src="assets/task6_lzbi.png" alt="Screenshot of test_flight.svg using level 0 bilinear interpolation" width="350px"/>
+						<figcaption>test_flight.svg, level 0, bilinear interpolation.</figcaption>
+					</figure>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		At level 0, level sampling is simply what we did in task 5: pixel sampling from either the single nearest texel or using an average of the 
+		four nearest texels of the full-resolution texture. With nearest neighbors, the moiré effects are the most visible, with 4 sets of 
+		concentric circles visible in the full image. The section focused by the pixel inspector shows that the lines of the tiles are very 
+		muddled, resulting in a dark blob, and the small scraps of paper on the floor look more like missing pixels than objects on the floor.
+		Bilinear interpolation generally improves the whole image, increasing the continuity of the tile lines, reducing the muddled tile area,
+		and adding a little dimensionality to the paper scraps. 
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+					<figure>
+						<img src="assets/task6_lnnn.png" alt="Screenshot of test_flight.svg using nearest level nearest neighbors" width="350px"/>
+						<figcaption>test_flight.svg, nearest level, nearest neighbors.</figcaption>
+					</figure>
+				</td>
+				<td style="text-align: center;">
+					<figure>
+						<img src="assets/task6_lnbi.png" alt="Screenshot of test_flight.svg using nearest level bilinear interpolation" width="350px"/>
+						<figcaption>test_flight.svg, nearest level, bilinear interpolation.</figcaption>
+					</figure>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		Sampling from the nearest mipmap level provides the greatest visual improvement out of all of these combinations by adding some 
+		antialiasing. With nearest neighbors pixel sampling, the moiré effects have completely disappeared, and the tile lines are visibly continuous. However, the vertical tile lines
+		are somewhat crooked, and the paper scraps have lost a lot of definition. Pixel sampling with bilinear interpolation once again improves the
+		image overall, with the lines being much more straight and fine, and the paper scraps having their shape restored and even more dimensionality,
+		although the image appears to be blurrier than the one rendered with nearest neighbors. 
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+					<figure>
+						<img src="assets/task6_llnn.png" alt="Screenshot of test_flight.svg using linear level nearest neighbors" width="350px"/>
+						<figcaption>test_flight.svg, linear level interpolation, nearest neighbors.</figcaption>
+					</figure>
+				</td>
+				<td style="text-align: center;">
+					<figure>
+						<img src="assets/task6_llbi.png" alt="Screenshot of test_flight.svg using trilinear filtering" width="350px"/>
+						<figcaption>test_flight.svg, linear level + bilinear interpolation (trilinear interpolation).</figcaption>
+					</figure>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		Interestingly, using linear level sampling doesn't improve on the images generated by nearest level sampling. This is likely just due to
+		this specific zoom level on a very high resolution image, where the adjacent mipmap levels provide very similar or even the same color values
+		for the texels at the pixel sampling locations. 
+		<br>
+		<br>
+		With regards to the tradeoffs between speed, memory usage, and antialiasing power: 
+		<ul>
+			<li>
+				The fastest texture mapping method is to sample at mipmap level 0 using the nearest neighbors pixel sampling method, since it 
+				requires no additional computation beyond finding the barycentric coordinates of the current screen sample location within the
+				bounding box. However, as shown in the example screenshots above, it provides no antialiasing and can manifest several artifacts
+				such as moiré effects and jaggies. Bilinear interpolation at level 0 provides very slight antialiasing effects, but requires additional 
+				computation and therefore time in getting the averaged color values of the four nearest texels.
+			</li>
+			<li>
+				As shown above, nearest level sampling produces the greatest increase in antialiasing power and image quality, but it does require
+				more computation and time from finding the vectors representing the change in screen space and then calculating the proper mipmap level to sample
+				from based on those vectors. Adding bilinear interpolation of the texels to this of course increases the computation time, but produces
+				the best antialiasing effects, even at 1x sampling rate. 
+			</li>
+			<li>
+				The most costly combination of these level and pixel sampling methods is trilinear filtering, since it uses the results of bilinear interpolation
+				pixel sampling on two different mipmap levels, then linearly interpolates between those results. It also may not improve the image
+				further than nearest level bilinear interpolation does, depending on the zoom level.
+			</li>
+			<li>
+				Regardless of the specific texture mapping method, supersampling overall has the highest cost in terms of time, computation, AND memory usage
+				because it requires that the total number of texture mapping operations be increased by \(sample\_rate * x \) per screen pixel, and then
+				also necessitates a downsampling process for all of these stored supersample values. The end result is that supersampling with high sampling rates does a 
+				great job of antialiasing rasterized images. However, I would argue that nearest level bilinear interpolation is more effective
+				for antialiasing than using level 0 nearest neighbor 16x sampling rate, since I observed more exaggerated jaggies with the latter. Supersampling
+				therefore may not be worth the tradeoff in image quality and cost, especially in memory usage since no other texture mapping methods require
+				nearly as much additional memory storage as expanding the sample buffer does.
+			</li>
+		</ul>
+		
 		<h2>(Optional) Task 7: Extra Credit - Draw Something Creative!</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 	</body>
