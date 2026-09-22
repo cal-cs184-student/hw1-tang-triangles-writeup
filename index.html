@@ -48,8 +48,18 @@
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
-
+		This homework covers many aspects of the basics of rendering images. We begin with rasterizing simple 2D single-color triangles,
+		then add in supersampling to add antialiasing effects and improve image quality, and add in transformations of objects. Implementing 
+		barycentric coordinates allows us to go one step further with color interpolation on our rasterized shapes, and also becomes very useful 
+		for texture mapping. We implement various methods for both pixel sampling and level sampling a texture, with the various combinations 
+		of these methods producing noticeable differences in image quality. 
+		<br>
+		<br>
+		Completing this homework gave me the most improved understanding of mipmapping specifically. It initially seemed like a very abstract concept 
+		that would be very difficult to enact in my code, but I felt enlightened when I grasped the concept of evaluating how much of the texture
+		a single pixel covers in minification, and the rest of task 6 was easy and enjoyable since it built on previous concepts. I also really 
+		enjoyed getting a better understanding of barycentric coordinates and their uses.  
+		
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
 		Rasterizing is the process of rendering vector graphics into 2D pixel images. 
 		To rasterize a triangle, we simply sample it in 2D, wherein we evaluate each pixel to determine if it falls
@@ -233,8 +243,34 @@
 
 		<h2>Task 6: "Level Sampling" with Mipmaps for Texture Mapping</h2>
 
-		
-
+		One of the difficulties of texture mapping occurs when we "minify" or zoom out of images. In this case, each pixel is relatively larger and encompasses a large
+		swath of texels, which makes it difficult to determine which texel's color should be used for that pixel; minor differences in texel selection
+		can largely affect the appearance and potentially the quality of the resulting image. While bilinear interpolation can help mitigate aliasing
+		effects, the number of texels corresponding to a pixel can grow exponentially in minification, making bilinear interpolation a very 
+		costly process. 
+		<br>
+		<br>
+		The solution to this lies in mipmapping, which is when we sample lower-resolution textures for "faraway" details to avoid aliasing effects.
+		Mipmaps are pre-computed versions of the texture at successively lower resolutions, where level 0 is the texture at its full size (e.g. 128x128),
+		level 1 is the texture at half of level 0's resolution (64x64), and so on until we reach a 1x1 texture for the highest level. Pixels that cover a large jump
+		in texture space should sample from a blurred texture at a higher level, and pixels that cover a small amount of texture space should 
+		sample from high-resolution textures at a lower level to maintain high detail. Once the proper mipmap level is identified, we can pixel sample from that level 
+		and use it for the pixel's color.
+		<br>
+		<br>
+		There are three methods of level sampling for texture mapping implemented in my code. The first is trivial -- at <strong>level 0</strong>, we're simply
+		performing pixel sampling using either nearest neighbors or bilinear interpolation on the full-resolution texture, as in task 5. For 
+		the other methods, however, we need to identify the proper level to sample from. This is achieved by calculating the 
+		barycentric coordinates for the points (x, y), (x+1, y), and (x, y+1), which are uv, dx_uv, and dy_uv respectively. Then, we calculate
+		additional vectors: duv_dx = dx_uv - uv and duv_dy = dy_uv - uv. These vectors are then scaled by the texture width and height, and we take their magnitudes
+		to determine how much of the texture the pixel sample covers. Finally, we calculate the level using the maximum of these magnitudes; the 
+		target mipmap level is calculated as \( D = log\_2{(max\_magnitude)} \). In <strong>nearest level sampling</strong>, we simply round this 
+		level value to the closest integer and pixel sample from the texture corresponding to that mipmap level. In <strong>linear level sampling</strong>,
+		we take the two mipmap levels adjacent to the calculated level, obtain the texel colors by pixel sampling each texture level, and then
+		linearly interpolate those two colors to get the final resulting color for the pixel. When we use both linear level sampling and bilinear
+		interpolation for pixel sampling, this is known as trilinear filtering, since we're using a linear interpolation of linear interpolations.
+		<br>
+		<br>
 		I used a high resolution screenshot (3840 x 2160) of one of my favorite video games, Mirror's Edge, to create the test_flight.svg,
 		and focused on the lower-right section of the image since significant moiré effects are visible on the tiled floor without antialiasing. 
 		The screenshots below are all shown at 1x sample rate to display the differences from each combination of texture mapping methods. 
@@ -257,9 +293,8 @@
 			</table>
 		</div>
 
-		At level 0, level sampling is simply what we did in task 5: pixel sampling from either the single nearest texel or using an average of the 
-		four nearest texels of the full-resolution texture. With nearest neighbors, the moiré effects are the most visible, with 4 sets of 
-		concentric circles visible in the full image. The section focused by the pixel inspector shows that the lines of the tiles are very 
+		At level 0, nearest neighbors produces the most visible amount of moiré effects, with 4 sets of 
+		concentric "circles" visible in the full image. The section focused by the pixel inspector shows that the lines of the tiles are very 
 		muddled, resulting in a dark blob, and the small scraps of paper on the floor look more like missing pixels than objects on the floor.
 		Bilinear interpolation generally improves the whole image, increasing the continuity of the tile lines, reducing the muddled tile area,
 		and adding a little dimensionality to the paper scraps. 
@@ -324,7 +359,7 @@
 			</li>
 			<li>
 				As shown above, nearest level sampling produces the greatest increase in antialiasing power and image quality, but it does require
-				more computation and time from finding the vectors representing the change in screen space and then calculating the proper mipmap level to sample
+				more computation and time from finding the vectors representing the change in texture space and then calculating the proper mipmap level to sample
 				from based on those vectors. Adding bilinear interpolation of the texels to this of course increases the computation time, but produces
 				the best antialiasing effects, even at 1x sampling rate. 
 			</li>
